@@ -1,0 +1,86 @@
+[
+  {
+    "id": "night-shift-nursing-school",
+    "title": "After the night shift",
+    "shortDescription": "A person working overnight hospital support shifts studies for nursing entrance exams between rest, family obligations, and long commutes because they want a more skilled and stable future.",
+    "aspirationTheme": "Education",
+    "tags": ["care work", "night shift", "study", "mobility"]
+  },
+  {
+    "id": "small-shop-digital-catalog",
+    "title": "Putting the shop online",
+    "shortDescription": "Someone helping at a small family shop spends weekends photographing inventory and learning basic digital tools because they want the business to survive and reach beyond foot traffic.",
+    "aspirationTheme": "Opportunity",
+    "tags": ["family business", "technology", "initiative", "growth"]
+  },
+  {
+    "id": "driving-lessons-for-independence",
+    "title": "Learning to drive at thirty-four",
+    "shortDescription": "A person takes driving lessons later than most people around them because reliable mobility would widen where they can work, whom they can care for, and how freely they can move.",
+    "aspirationTheme": "Freedom",
+    "tags": ["mobility", "confidence", "adulthood", "independence"]
+  },
+  {
+    "id": "community-college-transfer-plan",
+    "title": "Two classes at a time",
+    "shortDescription": "A student takes community college courses slowly while working and helping at home, holding onto a plan to transfer rather than giving up on higher education altogether.",
+    "aspirationTheme": "Education",
+    "tags": ["community college", "long-term plan", "family responsibility", "persistence"]
+  },
+  {
+    "id": "public-library-portfolio",
+    "title": "Building a portfolio at the library",
+    "shortDescription": "A job seeker uses library internet and borrowed software time to assemble a design portfolio, not for prestige but for a cleaner shot at stable work.",
+    "aspirationTheme": "Opportunity",
+    "tags": ["job search", "public resources", "design", "stability"]
+  },
+  {
+    "id": "saving-for-own-room",
+    "title": "Saving for one quiet room",
+    "shortDescription": "Someone sharing a crowded apartment sets aside money each month because having a room of their own would mean privacy, sleep, and the ability to think clearly again.",
+    "aspirationTheme": "Dignity",
+    "tags": ["housing", "privacy", "stability", "rest"]
+  },
+  {
+    "id": "weekend-english-classes",
+    "title": "Weekend English classes",
+    "shortDescription": "A person attends language classes on Sundays because stronger English would let them speak for themselves at work, in appointments, and in their child’s school meetings.",
+    "aspirationTheme": "Voice",
+    "tags": ["language", "confidence", "access", "parenting"]
+  },
+  {
+    "id": "repairing-used-laptop",
+    "title": "Repairing a secondhand laptop",
+    "shortDescription": "A teenager keeps fixing an old laptop so they can practice coding after school, following curiosity toward a future that feels larger than what is immediately around them.",
+    "aspirationTheme": "Possibility",
+    "tags": ["technology", "learning", "resourcefulness", "future"]
+  },
+  {
+    "id": "food-cart-permit",
+    "title": "Applying for the permit",
+    "shortDescription": "Someone who already cooks for neighbors starts the paperwork for a legal food cart because they want income they can grow rather than cash jobs that disappear overnight.",
+    "aspirationTheme": "Ownership",
+    "tags": ["small business", "paperwork", "income", "self-direction"]
+  },
+  {
+    "id": "evening-trade-certification",
+    "title": "Certification after work",
+    "shortDescription": "A warehouse worker goes to evening certification classes because a trade credential could mean safer work, better pay, and a body that hurts less over time.",
+    "aspirationTheme": "Security",
+    "tags": ["trade school", "physical labor", "upskilling", "health"]
+  },
+  {
+    "id": "reopening-the-notebook",
+    "title": "Reopening the notebook",
+    "shortDescription": "After years of postponing it, a person returns to writing in the early morning because they still want a creative life, even if it has to be built in small private pieces first.",
+    "aspirationTheme": "Creative life",
+    "tags": ["writing", "discipline", "identity", "small beginnings"]
+  },
+  {
+    "id": "green-card-exam-prep",
+    "title": "Studying after the kids sleep",
+    "shortDescription": "A parent studies for a professional licensing exam after the household is quiet because recognition of prior experience would open a more stable and respected path forward.",
+    "aspirationTheme": "Recognition",
+    "tags": ["licensing", "parenting", "migration", "professional identity"]
+  }
+]
