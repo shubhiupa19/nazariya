@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { stories } from "@/data/stories";
+import { guardrails } from "@/lib/site";
 import { PageShell } from "@/components/shared/page-shell";
 import { Button } from "@/components/ui/button";
 
@@ -38,32 +39,13 @@ const steps = [
   },
   {
     number: "02",
-    label: "What you felt",
-    copy: "The immediate conclusion your brain attached — harsh or absolute as it may be."
+    label: "What your brain concluded",
+    copy: "The immediate, harsh story your mind attached — exactly as it landed."
   },
   {
     number: "03",
-    label: "What's true",
-    copy: "Your actual context, constraints, responsibilities, and the real progress you can account for."
-  }
-];
-
-const distinctions = [
-  {
-    title: "Not motivation",
-    copy: "It does not hype you up or turn pain into a performance speech."
-  },
-  {
-    title: "Not comparison-down",
-    copy: "It does not ask you to feel better by finding someone who is doing worse."
-  },
-  {
-    title: "Not therapy",
-    copy: "It does not diagnose, process trauma, or substitute for deeper care."
-  },
-  {
-    title: "Just perspective correction",
-    copy: "It helps restore proportion when a visible milestone starts acting like a complete truth."
+    label: "Whose dream you're living",
+    copy: "An optional perspective — someone building toward what you already have. Or skip and one is created for you."
   }
 ];
 
@@ -116,52 +98,39 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Problem */}
-      <section className="py-24 md:py-36">
-        <div className="grid gap-10 md:grid-cols-2 md:gap-24 md:items-end">
-          <h2 className="font-serif text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.08] tracking-[-0.03em]">
-            We mistake a polished milestone for a complete measure of a life.
-          </h2>
-          <p className="text-base leading-8 text-muted-foreground md:text-[17px]">
-            People compare their full inner reality to someone else&apos;s
-            visible highlight and conclude they are behind. The distortion feels
-            factual because the milestone is real — but the comparison is built
-            on missing context and a harsh edit of your own life.
-          </p>
-        </div>
-      </section>
-
       {/* Example reframe */}
-      <section className="rounded-[2rem] border border-border bg-card p-7 md:p-12">
-        <div className="space-y-8">
-          <div className="space-y-2 border-b border-border/60 pb-6">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
-              Example reframe
-            </p>
-            <p className="text-sm leading-7 text-muted-foreground">
-              Trigger — a coworker announced a promotion and a new apartment in the same week.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {reframeSections.map((section) => (
-              <div
-                key={section.title}
-                className="rounded-[1.4rem] border border-border/70 bg-background p-5 md:p-6"
-              >
-                <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  {section.title}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-foreground/90 md:text-[15px]">
-                  {section.copy}
-                </p>
-              </div>
-            ))}
+      <section className="py-24 md:py-36">
+        <div className="rounded-[2rem] border border-border bg-card p-7 md:p-12">
+          <div className="space-y-8">
+            <div className="space-y-2 border-b border-border/60 pb-6">
+              <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+                Example reframe
+              </p>
+              <p className="text-sm leading-7 text-muted-foreground">
+                Trigger — a coworker announced a promotion and a new apartment in the same week.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {reframeSections.map((section) => (
+                <div
+                  key={section.title}
+                  className="rounded-[1.4rem] border border-border/70 bg-background p-5 md:p-6"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                    {section.title}
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-foreground/90 md:text-[15px]">
+                    {section.copy}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="py-24 md:py-36">
+      <section className="pb-24 md:pb-36">
         <div className="space-y-12">
           <div className="grid gap-6 md:grid-cols-2 md:gap-20 md:items-end">
             <div className="space-y-3">
@@ -169,13 +138,12 @@ export default function HomePage() {
                 How it works
               </p>
               <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-[-0.03em]">
-                Three inputs.<br />A cleaner frame.
+                Two inputs.<br />A cleaner frame.
               </h2>
             </div>
             <p className="text-base leading-8 text-muted-foreground md:text-[17px]">
-              Nazariya asks for what you saw, what story it triggered, and what
-              is actually true about your life. From that, it returns a
-              structured reframe in under a minute.
+              Describe what you saw and the story it triggered. Nazariya
+              returns a structured reframe in under a minute.
             </p>
           </div>
 
@@ -198,7 +166,7 @@ export default function HomePage() {
       </section>
 
       {/* Stories */}
-      <section className="py-24 md:py-36">
+      <section className="pb-24 md:pb-36">
         <div className="space-y-12">
           <div className="grid gap-6 md:grid-cols-2 md:gap-20 md:items-end">
             <div className="space-y-3">
@@ -244,31 +212,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Distinctions */}
+      {/* Guardrails */}
       <section className="space-y-10">
-        <div className="grid gap-6 md:grid-cols-2 md:gap-20 md:items-end">
-          <div className="space-y-3">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
-              What it is and isn&apos;t
-            </p>
-            <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-[-0.03em]">
-              It stays narrow<br />on purpose.
-            </h2>
-          </div>
+        <div className="space-y-3">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+            What it is and isn&apos;t
+          </p>
+          <h2 className="font-serif text-[clamp(2rem,4vw,3rem)] leading-tight tracking-[-0.03em]">
+            It stays narrow<br />on purpose.
+          </h2>
         </div>
 
         <div className="border-t border-border">
-          {distinctions.map((item) => (
+          {guardrails.map((item) => (
             <div
-              key={item.title}
-              className="grid gap-3 border-b border-border py-7 md:grid-cols-[280px_1fr] md:gap-16 md:items-baseline md:py-8"
+              key={item}
+              className="border-b border-border py-6 md:py-7"
             >
-              <p className="font-serif text-2xl leading-tight tracking-[-0.02em]">
-                {item.title}
-              </p>
-              <p className="text-base leading-7 text-muted-foreground">
-                {item.copy}
-              </p>
+              <p className="text-base leading-7 text-muted-foreground">{item}</p>
             </div>
           ))}
         </div>

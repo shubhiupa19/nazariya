@@ -46,11 +46,44 @@ type HistoryEntry = {
 
 const toneOptions: Tone[] = ["Gentle", "Direct", "Analytical"];
 const historyStorageKey = "nazariya.reframe-history";
+const draftStorageKey = "nazariya.form-draft";
 
 const initialValues: FormValues = {
   whatDidYouSee: "",
   brainStory: "",
 };
+
+function readDraft(): FormValues | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(draftStorageKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "whatDidYouSee" in parsed &&
+      "brainStory" in parsed &&
+      typeof (parsed as FormValues).whatDidYouSee === "string" &&
+      typeof (parsed as FormValues).brainStory === "string"
+    ) {
+      return parsed as FormValues;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(values: FormValues) {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(draftStorageKey, JSON.stringify(values));
+}
+
+function clearDraft() {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(draftStorageKey);
+}
 
 export function ReframeApp() {
   const router = useRouter();
@@ -59,7 +92,7 @@ export function ReframeApp() {
   const querySelectedStory = queryStoryId
     ? getStoryById(queryStoryId)
     : undefined;
-  const [values, setValues] = useState<FormValues>(initialValues);
+  const [values, setValues] = useState<FormValues>(() => readDraft() ?? initialValues);
   const [tone, setTone] = useState<Tone>("Gentle");
   const [errors, setErrors] = useState<
     Partial<Record<keyof FormValues, string>>
@@ -111,7 +144,11 @@ export function ReframeApp() {
   }
 
   function handleValueChange(field: keyof FormValues, value: string) {
-    setValues((current) => ({ ...current, [field]: value }));
+    setValues((current) => {
+      const next = { ...current, [field]: value };
+      writeDraft(next);
+      return next;
+    });
     setErrors((current) => ({ ...current, [field]: undefined }));
     setErrorMessage("");
     setCopied(false);
@@ -203,6 +240,7 @@ export function ReframeApp() {
   }
 
   function handleReset() {
+    clearDraft();
     setValues(initialValues);
     setTone("Gentle");
     setErrors({});

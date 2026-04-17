@@ -1,9 +1,9 @@
 import type { Route } from "next";
 
 export const navigationItems = [
-  { href: "/app" as Route, label: "App" },
+  { href: "/" as Route, label: "Home" },
+  { href: "/app" as Route, label: "Reframe" },
   { href: "/stories" as Route, label: "Stories" },
-  { href: "/about" as Route, label: "About" }
 ];
 
 export const siteCopy = {
