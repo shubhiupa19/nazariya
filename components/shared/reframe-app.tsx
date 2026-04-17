@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -88,6 +88,8 @@ function clearDraft() {
 export function ReframeApp() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
   const queryStoryId = searchParams.get("story");
   const querySelectedStory = queryStoryId
     ? getStoryById(queryStoryId)
@@ -123,6 +125,12 @@ export function ReframeApp() {
   useEffect(() => {
     setHistoryEntries(readHistoryEntries());
   }, []);
+
+  useEffect(() => {
+    if (status === "success" && outputRef.current) {
+      outputRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [status]);
 
   const isFormComplete = Object.values(values).every(
     (value) => value.trim().length >= 12,
@@ -248,6 +256,7 @@ export function ReframeApp() {
     setStatus("idle");
     setErrorMessage("");
     setCopied(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleClearSelectedStory() {
@@ -306,7 +315,18 @@ export function ReframeApp() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 lg:gap-10">
       <Card className="rounded-[2rem] border-border bg-card/95">
         <CardContent className="p-6 md:p-8 lg:p-10">
-          <form className="space-y-8" onSubmit={handleSubmit} noValidate>
+          <form
+            ref={formRef}
+            className="space-y-8"
+            onSubmit={handleSubmit}
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && isFormComplete && status !== "loading") {
+                e.preventDefault();
+                formRef.current?.requestSubmit();
+              }
+            }}
+            noValidate
+          >
             <div className="space-y-3 text-center md:space-y-4">
               <h1 className="font-serif text-4xl tracking-[-0.03em] text-balance sm:text-5xl">
                 Get perspective without added noise.
@@ -509,7 +529,7 @@ export function ReframeApp() {
           </div>
         </div>
 
-        <div aria-live="polite" aria-busy={status === "loading"}>
+        <div ref={outputRef} aria-live="polite" aria-busy={status === "loading"}>
           {status === "loading" ? <LoadingSkeleton /> : null}
 
           {status !== "loading" && result ? (
@@ -764,12 +784,34 @@ function FieldBlock({
 }
 
 function OutputCard({ title, copy }: { title: string; copy: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(copy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard unavailable — fail silently
+    }
+  }
+
   return (
     <Card className="surface-card-interactive bg-card/95">
       <CardContent className="p-5 md:p-6">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-          {title}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            {title}
+          </p>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="shrink-0 rounded-full p-1 text-muted-foreground/40 transition-colors hover:text-muted-foreground"
+            aria-label={`Copy ${title}`}
+          >
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        </div>
         <p className="mt-3 text-sm leading-7 text-foreground/90 md:text-[15px]">
           {copy}
         </p>
