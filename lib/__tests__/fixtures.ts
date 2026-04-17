@@ -1,4 +1,4 @@
-import type { ReframeRequest, ReframeOutput } from "@/lib/openai/reframe-prompt";
+import type { ReframeRequest, ReframeOutput } from "@/lib/ai/reframe-prompt";
 
 export const VALID_REFRAME_REQUESTS: Array<{
   name: string;
@@ -9,7 +9,6 @@ export const VALID_REFRAME_REQUESTS: Array<{
     data: {
       whatDidYouSee: "A former coworker announced they got promoted to senior engineer.",
       brainStory: "Everyone else is progressing faster. I am not advancing like I should be.",
-      currentTruth: "I have been in my current role for 2 years with good feedback. I am still learning the codebase.",
       tone: "Gentle",
     },
   },
@@ -20,8 +19,6 @@ export const VALID_REFRAME_REQUESTS: Array<{
         "A friend posted photos from their vacation in Europe, looking very happy and relaxed.",
       brainStory:
         "They have freedom and money. My life is financially constrained and boring by comparison.",
-      currentTruth:
-        "I am working overtime this month to save for a car. My friend has help from parents with travel expenses.",
       tone: "Direct",
       selectedPerspective: {
         title: "Learning to drive at thirty-four",
@@ -39,8 +36,6 @@ export const VALID_REFRAME_REQUESTS: Array<{
         "Someone I know published a technical article that got lots of engagement.",
       brainStory:
         "They are producing valuable work. I have nothing worth publishing. My skills are not good enough.",
-      currentTruth:
-        "I code daily but have not written publicly yet. I have been focused on learning frameworks and mentoring juniors.",
       tone: "Analytical",
     },
   },
@@ -55,7 +50,6 @@ export const INVALID_REFRAME_REQUESTS: Array<{
     name: "Missing whatDidYouSee",
     data: {
       brainStory: "I feel behind.",
-      currentTruth: "I have a job.",
       tone: "Gentle",
     },
     expectedError: "whatDidYouSee",
@@ -65,7 +59,6 @@ export const INVALID_REFRAME_REQUESTS: Array<{
     data: {
       whatDidYouSee: "short",
       brainStory: "I feel behind in my life and career development.",
-      currentTruth: "I have a job and friends.",
       tone: "Gentle",
     },
     expectedError: "at least 12 characters",
@@ -75,7 +68,6 @@ export const INVALID_REFRAME_REQUESTS: Array<{
     data: {
       whatDidYouSee: "x".repeat(2001),
       brainStory: "I feel behind in my life and career development.",
-      currentTruth: "I have a job and friends.",
       tone: "Gentle",
     },
     expectedError: "2000 characters",
@@ -83,10 +75,8 @@ export const INVALID_REFRAME_REQUESTS: Array<{
   {
     name: "Invalid tone",
     data: {
-      whatDidYouSee:
-        "Someone got promoted and announced it on social media.",
+      whatDidYouSee: "Someone got promoted and announced it on social media.",
       brainStory: "Everyone is ahead of me in their careers.",
-      currentTruth: "I am still working in my current position.",
       tone: "Aggressive",
     },
     expectedError: "Gentle, Direct, Analytical",
@@ -94,10 +84,8 @@ export const INVALID_REFRAME_REQUESTS: Array<{
   {
     name: "Tone is not a string",
     data: {
-      whatDidYouSee:
-        "Someone got promoted and announced it on social media.",
+      whatDidYouSee: "Someone got promoted and announced it on social media.",
       brainStory: "Everyone is ahead of me in their careers.",
-      currentTruth: "I am still working in my current position.",
       tone: 123,
     },
     expectedError: "must be a string",
@@ -129,11 +117,11 @@ export const VALID_REFRAME_OUTPUTS: Array<{
       whatHappened:
         "Your coworker received a promotion. Your mind interpreted this as proof that you should also be advancing, and quickly.",
       whatsMissing:
-        "You are not seeing her private timeline, the relationships or mentorship that helped her advance, or what circumstances aligned in her favor. You are seeing an outcome, not the path.",
+        "You are not seeing her private timeline, the relationships or mentorship that helped her advance, or what circumstances aligned in her favor.",
       realPerspective:
-        "Her advancement may be real without being a verdict on your pace. You are building under different conditions and should be evaluated against your own progress, not others'.",
+        "Her advancement may be real without being a verdict on your pace. You are building under different conditions and should be evaluated against your own progress.",
       reAnchor:
-        "You have been in your role for 2 years with good feedback. You are still competent and learning. The timeline is not broken.",
+        "You have been in your role for 2 years with good feedback. The timeline is not broken.",
     },
   },
   {

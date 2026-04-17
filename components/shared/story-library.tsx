@@ -32,7 +32,7 @@ export function StoryLibrary() {
               className={[
                 "rounded-full border px-4 py-2 text-sm transition-colors",
                 isActive
-                  ? "border-foreground bg-foreground text-background"
+                  ? "border-highlight bg-highlight text-highlight-foreground"
                   : "border-border bg-card text-foreground hover:bg-secondary/70"
               ].join(" ")}
               aria-pressed={isActive}

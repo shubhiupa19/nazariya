@@ -14,7 +14,7 @@ export const siteCopy = {
         "You saw a visible outcome and your mind treated it as a verdict on your own timeline."
     },
     {
-      title: "What’s missing",
+      title: "What's missing",
       preview:
         "You do not know the years, support, tradeoffs, luck, losses, or private realities that sit behind the polished moment."
     },
@@ -33,7 +33,8 @@ export const siteCopy = {
 
 export const guardrails = [
   "No shaming the user for feeling triggered by comparison.",
-  "No minimization through “others have it worse.”",
+  'No minimization through "others have it worse."',
+  "Perspective context is aspiration-based, not deficit-based — someone is building toward what you have, not suffering beneath it.",
   "No tearing down the person being compared against.",
   "No fabricated named people or invented case studies.",
   "No motivational clichés, platitudes, or forced positivity."

@@ -18,10 +18,19 @@ export default function AboutPage() {
             </p>
             <p className="leading-7 text-muted-foreground">
               We compare our full, lived reality to a polished sliver of
-              someone else&apos;s life. Nazariya is built to slow that reaction
-              down and reconstruct the missing context without insulting the
-              other person, shaming the user, or pretending hard feelings can be
-              solved with slogans.
+              someone else&apos;s life. Nazariya slows that reaction down and
+              reconstructs the missing context — without shaming the user,
+              attacking the comparison target, or pretending hard feelings can
+              be solved with slogans.
+            </p>
+            <p className="leading-7 text-muted-foreground">
+              One part of that reconstruction is aspiration. The library
+              includes grounded perspectives — people navigating real
+              constraints toward something they are still building toward.
+              Including one in a reframe is not an invitation to feel grateful
+              by comparison. It is a way to see your own circumstances from the
+              outside: as an arrival point someone else is still working toward.
+              Aspiration, not pity.
             </p>
             <p className="leading-7 text-muted-foreground">
               The product is intentionally narrow. It is not a therapy app, a

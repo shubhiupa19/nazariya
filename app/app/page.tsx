@@ -1,10 +1,14 @@
+import { Suspense } from "react";
+
 import { PageShell } from "@/components/shared/page-shell";
 import { ReframeApp } from "@/components/shared/reframe-app";
 
 export default function MainAppPage() {
   return (
     <PageShell className="pb-20 pt-10 md:pb-24 md:pt-14">
-      <ReframeApp />
+      <Suspense>
+        <ReframeApp />
+      </Suspense>
     </PageShell>
   );
 }

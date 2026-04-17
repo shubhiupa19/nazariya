@@ -7,7 +7,7 @@ import type {
   ReframeRequest,
   ReframeOutput,
   ReframeTone,
-} from "@/lib/openai/reframe-prompt";
+} from "@/lib/ai/reframe-prompt";
 
 /**
  * Result type for validation operations.
@@ -215,15 +215,6 @@ export function validateReframeRequest(
     return brainStoryValidation;
   }
 
-  // Validate currentTruth
-  const currentTruthValidation = validateTextField(
-    candidate.currentTruth,
-    "currentTruth"
-  );
-  if (!currentTruthValidation.success) {
-    return currentTruthValidation;
-  }
-
   // Validate tone
   const toneValidation = validateTone(candidate.tone);
   if (!toneValidation.success) {
@@ -243,7 +234,6 @@ export function validateReframeRequest(
     data: {
       whatDidYouSee: whatDidYouSeeValidation.data,
       brainStory: brainStoryValidation.data,
-      currentTruth: currentTruthValidation.data,
       tone: toneValidation.data,
       selectedPerspective: perspectiveValidation.data ?? undefined,
     },

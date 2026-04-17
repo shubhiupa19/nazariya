@@ -1,5 +1,4 @@
-import OpenAI from "openai";
-import { APIError } from "openai/error";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 
 import {
@@ -7,19 +6,16 @@ import {
   type ReframeOutput,
   buildReframeSystemPrompt,
   buildReframeUserMessage,
-  reframeResponseSchema
-} from "@/lib/openai/reframe-prompt";
+  reframeResponseSchema,
+} from "@/lib/ai/reframe-prompt";
 import {
   validateReframeRequest,
   validateReframeOutput,
 } from "@/lib/validation";
-import {
-  APIErrorHandler,
-  verifyAPIResponse,
-} from "@/lib/error-handling";
+import { APIErrorHandler, verifyAPIResponse } from "@/lib/error-handling";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const hopelessnessPatterns = [
@@ -30,7 +26,7 @@ const hopelessnessPatterns = [
   /\bi can't go on\b/i,
   /\bi cannot go on\b/i,
   /\bgive up on everything\b/i,
-  /\bno point in being here\b/i
+  /\bno point in being here\b/i,
 ];
 const selfHatePatterns = [
   /\bi hate myself\b/i,
@@ -39,17 +35,33 @@ const selfHatePatterns = [
   /\bi'm worthless\b/i,
   /\bi can't stand myself\b/i,
   /\bi cannot stand myself\b/i,
-  /\bi deserve nothing\b/i
+  /\bi deserve nothing\b/i,
 ];
+
+// Tool definition for structured output — Groq supports OpenAI-compatible
+// function calling which enforces the response shape reliably.
+const reframeTool: Groq.Chat.Completions.ChatCompletionTool = {
+  type: "function",
+  function: {
+    name: "submit_reframe",
+    description: "Submit the structured perspective reframe response.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: [...reframeResponseSchema.required],
+      properties: reframeResponseSchema.properties,
+    },
+  },
+};
 
 export async function POST(request: Request) {
   const errorHandler = new APIErrorHandler();
 
-  if (!process.env.OPENAI_API_KEY) {
-    errorHandler.addError(500, "OPENAI_API_KEY is not configured on the server.");
+  if (!process.env.GROQ_API_KEY) {
+    errorHandler.addError(500, "GROQ_API_KEY is not configured on the server.");
     return NextResponse.json(
       { error: errorHandler.getLastError()?.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -61,7 +73,7 @@ export async function POST(request: Request) {
     errorHandler.addError(400, "Request body must be valid JSON.");
     return NextResponse.json(
       { error: errorHandler.getLastError()?.message },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -69,10 +81,7 @@ export async function POST(request: Request) {
 
   if (!validated.success) {
     errorHandler.addError(400, validated.error);
-    return NextResponse.json(
-      { error: validated.error },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: validated.error }, { status: 400 });
   }
 
   if (indicatesSevereDistress(validated.data)) {
@@ -80,84 +89,90 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+    const response = await groq.chat.completions.create({
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
       messages: [
         {
           role: "system",
-          content: buildReframeSystemPrompt(validated.data)
+          content: buildReframeSystemPrompt(validated.data),
         },
         {
           role: "user",
-          content: buildReframeUserMessage(validated.data)
-        }
+          content: buildReframeUserMessage(validated.data),
+        },
       ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "nazariya_reframe",
-          strict: true,
-          schema: reframeResponseSchema as unknown as Record<string, unknown>
-        }
-      }
+      tools: [reframeTool],
+      tool_choice: { type: "function", function: { name: "submit_reframe" } },
     });
 
-    const contentValue = response.choices[0]?.message.content;
-    if (typeof contentValue !== "string") {
-      errorHandler.addError(502, "Model returned empty response.");
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+
+    if (!toolCall?.function?.arguments) {
+      errorHandler.addError(502, "Model did not return a tool call response.");
       return NextResponse.json(
         { error: "Failed to generate response." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
-    const parsed = validateReframeOutput(JSON.parse(contentValue));
+    let rawOutput: unknown;
+    try {
+      rawOutput = JSON.parse(toolCall.function.arguments);
+    } catch {
+      errorHandler.addError(502, "Model returned malformed JSON.");
+      return NextResponse.json(
+        { error: "Failed to parse model response." },
+        { status: 502 },
+      );
+    }
+
+    const parsed = validateReframeOutput(rawOutput);
 
     if (!parsed.success) {
       errorHandler.addError(502, parsed.error);
       return NextResponse.json(
         { error: "The model returned an invalid response shape." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
-    // Verify response format before sending
     if (!verifyAPIResponse({ ...parsed.data, safetyMode: false }, true)) {
       errorHandler.addError(502, "Response verification failed.");
       return NextResponse.json(
         { error: "Response validation failed." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
     return NextResponse.json({
       ...parsed.data,
-      safetyMode: false
+      safetyMode: false,
     });
   } catch (error) {
-    if (error instanceof APIError) {
-      const friendlyMessage = error.status === 401
-        ? "OpenAI authentication failed. Check the server API key."
-        : "OpenAI could not generate a response right now.";
+    if (error instanceof Groq.APIError) {
+      const friendlyMessage =
+        error.status === 401
+          ? "Groq authentication failed. Check the server API key."
+          : "Groq could not generate a response right now.";
 
       errorHandler.addError(error.status || 502, friendlyMessage);
       return NextResponse.json(
         { error: friendlyMessage },
-        { status: error.status || 502 }
+        { status: error.status || 502 },
       );
     }
 
-    const message = error instanceof Error ? error.message : "Unexpected server error while generating perspective.";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unexpected server error while generating perspective.";
     errorHandler.addError(500, message);
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 function indicatesSevereDistress(input: ReframeRequest) {
-  const text = [input.brainStory, input.currentTruth].join("\n");
+  const text = input.brainStory;
 
   return (
     hopelessnessPatterns.some((pattern) => pattern.test(text)) ||
@@ -172,7 +187,7 @@ function buildSafetyResponse(tone: ReframeRequest["tone"]): ReframeOutput {
     Direct:
       "This reads as more than a standard perspective correction moment. A clean reframe is not the right tool first; step away from the trigger, interrupt the spiral, and lower the intensity before asking your mind to interpret anything.",
     Analytical:
-      "The emotional intensity here suggests the problem is no longer just distorted comparison. When the language turns this absolute or self-attacking, interpretation becomes less reliable, so the next useful step is to reduce input and stabilize rather than continue analyzing."
+      "The emotional intensity here suggests the problem is no longer just distorted comparison. When the language turns this absolute or self-attacking, interpretation becomes less reliable, so the next useful step is to reduce input and stabilize rather than continue analyzing.",
   };
 
   return {
@@ -183,6 +198,6 @@ function buildSafetyResponse(tone: ReframeRequest["tone"]): ReframeOutput {
     realPerspective: realPerspectiveByTone[tone],
     reAnchor:
       "For now, step away from the scroll or comparison trigger, and reach out to someone grounded if you can. A trusted friend, family member, therapist, or local crisis support can help hold perspective with you; if you feel at risk of acting on these thoughts, contact emergency or crisis support now.",
-    safetyMode: true
+    safetyMode: true,
   };
 }

@@ -3,7 +3,6 @@ export type ReframeTone = "Gentle" | "Direct" | "Analytical";
 export type ReframeRequest = {
   whatDidYouSee: string;
   brainStory: string;
-  currentTruth: string;
   tone: ReframeTone;
   selectedPerspective?: {
     title: string;
@@ -74,9 +73,10 @@ export function buildReframeSystemPrompt(input: ReframeRequest) {
     "You are Nazariya. You help people correct distorted comparison-based conclusions.",
     "The user has seen another person's visible milestone and their mind has turned it into a painful story about their own life.",
     "Write like a thoughtful friend with good judgment, not like a chatbot, therapist, coach, or motivational speaker.",
-    "Your tone must be calm, observant, grounded, emotionally intelligent, and concise.",
+    "Your tone must be calm, observant, grounded, emotionally intelligent, and brief.",
     "Never use toxic positivity.",
     "Never tell the user that others have it worse.",
+    "When using a perspective story, do not frame it as 'someone has less than you.' Frame it as 'someone is actively building toward what you already have access to.' The distinction matters: aspiration restores proportion, pity just produces shame.",
     "Never attack, belittle, or undermine the comparison target.",
     "Never invent named people, backstories, or fabricated individuals.",
     "Never sound like Instagram-style inspiration or life advice content.",
@@ -84,13 +84,13 @@ export function buildReframeSystemPrompt(input: ReframeRequest) {
     "Do not shame the user for reacting strongly.",
     "Do not minimize the feeling, but do not romanticize it either.",
     "Stay specific to the user's input. Do not drift into generic reflections.",
-    "If optional perspective context is provided, use it lightly as an extra reminder of human complexity and aspiration. Do not force it into every section if it does not fit naturally.",
-    "The output must contain exactly four sections with these purposes:",
-    "What happened: briefly describe the visible event and the conclusion the user's mind attached to it.",
-    "What's missing: identify the absent context, unknowns, and asymmetries in the comparison.",
-    "A real perspective: offer a cleaner interpretation that is believable, sober, and non-performative.",
-    "Re-anchor: return the user to the concrete truth of their present life, constraints, responsibilities, and progress.",
-    "Each section should be 2 to 4 sentences, concise, and free of filler.",
+    "Orient toward the user's own path, dreams, and what they are building — not toward analyzing the comparison target.",
+    "If optional perspective context is provided, use it lightly as a quiet reminder that complex, grounded lives are common. Do not force it.",
+    "The output must contain exactly four sections. Each section is 1 to 2 sentences only — sharp, clear, no filler:",
+    "What happened: name the visible event and the automatic conclusion the user's mind formed.",
+    "What's missing: name the context the comparison skips — briefly, without dwelling on the other person.",
+    "A real perspective: reframe around what the user already has — not what they lack. Show them that their actual situation is the aspiration someone else is quietly working toward. If a perspective story is provided, name what that person is striving for and note that the user already has a version of it. If no story is provided, generate one specific grounded example: name a type of person who would genuinely want the user's exact circumstances right now — the education, the city, the work, the access, the stability they are building.",
+    "Re-anchor: one grounding sentence returning the user to their own present motion, from the lens of already being someone's dream rather than someone else's shadow.",
     toneGuidance[input.tone]
   ].join(" ");
 }
@@ -99,10 +99,9 @@ export function buildReframeUserMessage(input: ReframeRequest) {
   return [
     `What the user saw: ${input.whatDidYouSee}`,
     `The story their brain told: ${input.brainStory}`,
-    `What is actually true about their life right now: ${input.currentTruth}`,
     input.selectedPerspective
-      ? `Optional selected perspective context: ${input.selectedPerspective.title} - ${input.selectedPerspective.shortDescription} Theme: ${input.selectedPerspective.aspirationTheme}. Tags: ${input.selectedPerspective.tags.join(", ")}.`
-      : "Optional selected perspective context: none.",
+      ? `Perspective: ${input.selectedPerspective.title} — ${input.selectedPerspective.shortDescription} Theme: ${input.selectedPerspective.aspirationTheme}. Tags: ${input.selectedPerspective.tags.join(", ")}. Use this in the 'A real perspective' section to show the user that their life is already the aspiration this person is reaching toward.`
+      : "Perspective: none provided. For the 'A real perspective' section, generate a specific grounded example of someone who would genuinely want what the user already has right now.",
     `Requested tone: ${input.tone}`,
     "Return only the structured response."
   ].join("\n");
@@ -116,8 +115,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw someone my age post about getting promoted and moving into a beautiful apartment in the same week.",
       brainStory:
         "My brain told me I am behind in every category and that I have mismanaged my twenties.",
-      currentTruth:
-        "I am recovering from burnout, paying off debt, and rebuilding stability more slowly than I expected.",
       tone: "Gentle"
     },
     output: {
@@ -138,8 +135,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw a close friend get engaged after posting a ring photo and a long caption about finding the right person.",
       brainStory:
         "My brain said I am unchosen and that everyone else is moving into adult life while I am still stuck.",
-      currentTruth:
-        "I am single, I want partnership, and I have also been carrying a lot of grief and family responsibility this year.",
       tone: "Gentle"
     },
     output: {
@@ -160,8 +155,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw a founder on LinkedIn announce a big fundraise with press coverage and hundreds of congratulatory comments.",
       brainStory:
         "My brain said I missed my shot and that my work is invisible because I am not exceptional enough.",
-      currentTruth:
-        "I have been building carefully, I am early, and I am still supporting myself with contract work while figuring out what is viable.",
       tone: "Direct"
     },
     output: {
@@ -182,8 +175,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw an old classmate post photos of a house they just bought in the suburbs with a caption about feeling settled.",
       brainStory:
         "My brain told me I am financially irresponsible and that I have nothing solid to show for my life.",
-      currentTruth:
-        "I live in a rented apartment in an expensive city, I chose flexibility for work, and I am still building savings after a career change.",
       tone: "Analytical"
     },
     output: {
@@ -204,8 +195,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw a friend finish a marathon and write about discipline and consistency after training for months.",
       brainStory:
         "My brain said I am weak and that I can never follow through on anything important.",
-      currentTruth:
-        "I have been dealing with a chronic health issue and my energy has been unpredictable for most of this year.",
       tone: "Gentle"
     },
     output: {
@@ -226,8 +215,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I found out my younger sibling is making significantly more money than I am already.",
       brainStory:
         "My brain said I am the disappointing one and that I should be further ahead by now.",
-      currentTruth:
-        "I chose a lower-paying field that I care about, and I have also been helping my parents financially for years.",
       tone: "Direct"
     },
     output: {
@@ -248,8 +235,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw a friend announce the birth of their second child with photos that made their family life look full and settled.",
       brainStory:
         "My brain told me I waited too long to build a life and now I am going to miss my chance.",
-      currentTruth:
-        "I am still unsure whether I want children, and I have only recently reached a more stable point in work and mental clarity.",
       tone: "Analytical"
     },
     output: {
@@ -270,8 +255,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw a coworker post clips from a TEDx talk and everyone at work was praising how articulate and accomplished they are.",
       brainStory:
         "My brain said I am forgettable and that I will never be the person people naturally notice or respect.",
-      currentTruth:
-        "I do good work, but I am quieter, less self-promoting, and still learning how to speak with confidence in public.",
       tone: "Direct"
     },
     output: {
@@ -292,8 +275,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw an artist friend post that their show sold out and there were photos of a full room and people celebrating them.",
       brainStory:
         "My brain said I am talentless and that I have been wasting years on work nobody wants.",
-      currentTruth:
-        "I am still early in my craft, I have had inconsistent time because of my day job, and I have not yet made enough work to be seen clearly.",
       tone: "Gentle"
     },
     output: {
@@ -314,8 +295,6 @@ export const reframeTestFixtures: ReframeFixture[] = [
         "I saw my former partner posting with someone new looking happy only a few months after our breakup.",
       brainStory:
         "My brain said I was easy to replace and that I am the one who is still broken and stuck.",
-      currentTruth:
-        "I am still grieving the relationship, trying to stabilize myself, and I have been more withdrawn since the breakup.",
       tone: "Analytical"
     },
     output: {

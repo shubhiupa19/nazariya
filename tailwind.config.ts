@@ -27,7 +27,9 @@ const config: Config = {
         "destructive-foreground": "hsl(var(--destructive-foreground))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))"
+        ring: "hsl(var(--ring))",
+        highlight: "hsl(var(--highlight))",
+        "highlight-foreground": "hsl(var(--highlight-foreground))"
       },
       borderRadius: {
         lg: "var(--radius)",

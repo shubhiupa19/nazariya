@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -10,7 +11,7 @@ import {
   LoaderCircle,
   RotateCcw,
   Trash2,
-  X
+  X,
 } from "lucide-react";
 
 import { type Story, getStoryById } from "@/data/stories";
@@ -23,7 +24,6 @@ type Tone = "Gentle" | "Direct" | "Analytical";
 type FormValues = {
   whatDidYouSee: string;
   brainStory: string;
-  currentTruth: string;
 };
 
 type ReframeResponse = {
@@ -50,32 +50,35 @@ const historyStorageKey = "nazariya.reframe-history";
 const initialValues: FormValues = {
   whatDidYouSee: "",
   brainStory: "",
-  currentTruth: ""
 };
 
 export function ReframeApp() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryStoryId = searchParams.get("story");
-  const querySelectedStory = queryStoryId ? getStoryById(queryStoryId) : undefined;
+  const querySelectedStory = queryStoryId
+    ? getStoryById(queryStoryId)
+    : undefined;
   const [values, setValues] = useState<FormValues>(initialValues);
   const [tone, setTone] = useState<Tone>("Gentle");
-  const [errors, setErrors] = useState<Partial<Record<keyof FormValues, string>>>(
-    {}
-  );
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FormValues, string>>
+  >({});
   const [result, setResult] = useState<ReframeResponse | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
-    "idle"
-  );
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
-  const [restoredStoryUsage, setRestoredStoryUsage] = useState<boolean | null>(null);
+  const [restoredStoryUsage, setRestoredStoryUsage] = useState<boolean | null>(
+    null,
+  );
   const [selectedStory, setSelectedStory] = useState<Story | null>(
-    querySelectedStory ?? null
+    querySelectedStory ?? null,
   );
   const [useSelectedStory, setUseSelectedStory] = useState(
-    Boolean(querySelectedStory)
+    Boolean(querySelectedStory),
   );
 
   useEffect(() => {
@@ -89,7 +92,7 @@ export function ReframeApp() {
   }, []);
 
   const isFormComplete = Object.values(values).every(
-    (value) => value.trim().length >= 12
+    (value) => value.trim().length >= 12,
   );
 
   function validateForm(nextValues: FormValues) {
@@ -100,11 +103,8 @@ export function ReframeApp() {
     }
 
     if (nextValues.brainStory.trim().length < 12) {
-      nextErrors.brainStory = "Name the story clearly so the reframe has something real to work with.";
-    }
-
-    if (nextValues.currentTruth.trim().length < 12) {
-      nextErrors.currentTruth = "Ground this in the concrete facts of your life right now.";
+      nextErrors.brainStory =
+        "Name the story clearly so the reframe has something real to work with.";
     }
 
     return nextErrors;
@@ -135,12 +135,11 @@ export function ReframeApp() {
       const response = await fetch("/api/reframe", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           whatDidYouSee: values.whatDidYouSee.trim(),
           brainStory: values.brainStory.trim(),
-          currentTruth: values.currentTruth.trim(),
           tone,
           selectedPerspective:
             selectedStory && useSelectedStory
@@ -149,16 +148,20 @@ export function ReframeApp() {
                   title: selectedStory.title,
                   shortDescription: selectedStory.shortDescription,
                   aspirationTheme: selectedStory.aspirationTheme,
-                  tags: selectedStory.tags
+                  tags: selectedStory.tags,
                 }
-              : undefined
-        })
+              : undefined,
+        }),
       });
 
-      const data = (await response.json()) as ReframeResponse & { error?: string };
+      const data = (await response.json()) as ReframeResponse & {
+        error?: string;
+      };
 
       if (!response.ok) {
-        throw new Error(data.error || "Unable to generate perspective right now.");
+        throw new Error(
+          data.error || "Unable to generate perspective right now.",
+        );
       }
 
       setResult(data);
@@ -169,7 +172,7 @@ export function ReframeApp() {
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong while generating perspective."
+          : "Something went wrong while generating perspective.",
       );
     }
   }
@@ -183,7 +186,7 @@ export function ReframeApp() {
       ["What happened", result.whatHappened],
       ["What’s missing", result.whatsMissing],
       ["A real perspective", result.realPerspective],
-      ["Re-anchor", result.reAnchor]
+      ["Re-anchor", result.reAnchor],
     ]
       .map(([title, copy]) => `${title}\n${copy}`)
       .join("\n\n");
@@ -193,7 +196,9 @@ export function ReframeApp() {
       setCopied(true);
       setErrorMessage("");
     } catch {
-      setErrorMessage("Could not copy the output. You can still select and copy it manually.");
+      setErrorMessage(
+        "Could not copy the output. You can still select and copy it manually.",
+      );
     }
   }
 
@@ -225,7 +230,7 @@ export function ReframeApp() {
       tone,
       result,
       selectedStory,
-      useSelectedStory
+      useSelectedStory,
     };
 
     const nextHistory = [entry, ...historyEntries].slice(0, 20);
@@ -265,16 +270,12 @@ export function ReframeApp() {
         <CardContent className="p-6 md:p-8 lg:p-10">
           <form className="space-y-8" onSubmit={handleSubmit} noValidate>
             <div className="space-y-3 text-center md:space-y-4">
-              <p className="text-[11px] uppercase tracking-[0.26em] text-muted-foreground">
-                Main app
-              </p>
               <h1 className="font-serif text-4xl tracking-[-0.03em] text-balance sm:text-5xl">
                 Get perspective without added noise.
               </h1>
               <p className="mx-auto max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base md:text-[15px]">
-                Describe what you saw, the story it triggered, and the reality
-                you are actually living in. Nazariya returns a calmer, more
-                accurate frame.
+                Describe what you saw and the story it triggered. Nazariya
+                returns a calmer, more accurate frame in under a minute.
               </p>
             </div>
 
@@ -317,24 +318,51 @@ export function ReframeApp() {
                 />
               </FieldBlock>
 
-              <FieldBlock
-                fieldId="current-truth"
-                label="What is actually true about your life right now?"
-                description="Ground the response in context, constraints, responsibilities, and real progress."
-                error={errors.currentTruth}
-              >
-                <Textarea
-                  id="current-truth"
-                  value={values.currentTruth}
-                  onChange={(event) =>
-                    handleValueChange("currentTruth", event.target.value)
-                  }
-                  placeholder="I am rebuilding after burnout, supporting family, and making steady progress that is slower but real."
-                  rows={4}
-                  aria-describedby="current-truth-description"
-                  aria-invalid={Boolean(errors.currentTruth)}
-                />
-              </FieldBlock>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">Whose dream are you already living?</p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Choose someone whose aspiration mirrors what you already have. Skip and Nazariya will generate one for you.
+                </p>
+              </div>
+
+              {selectedStory && useSelectedStory ? (
+                <div className="flex items-start justify-between gap-3 rounded-[1.25rem] border border-highlight bg-secondary/60 p-4">
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                      {selectedStory.aspirationTheme}
+                    </p>
+                    <p className="font-serif text-lg leading-tight tracking-[-0.02em]">
+                      {selectedStory.title}
+                    </p>
+                    <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+                      {selectedStory.shortDescription}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearSelectedStory}
+                    className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    aria-label="Remove perspective"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-4 rounded-[1.25rem] border border-dashed border-border p-4">
+                  <p className="text-sm text-muted-foreground">
+                    No perspective selected — one will be created for you.
+                  </p>
+                  <Link
+                    href={"/stories" as never}
+                    className="shrink-0 text-sm font-medium text-foreground hover:underline"
+                  >
+                    Browse →
+                  </Link>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -360,8 +388,8 @@ export function ReframeApp() {
                       className={[
                         "rounded-[1.2rem] border px-4 py-3 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                         isActive
-                          ? "border-foreground bg-foreground text-background shadow-[0_14px_30px_rgba(37,29,24,0.12)]"
-                          : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:bg-secondary/70"
+                          ? "border-highlight bg-highlight text-highlight-foreground shadow-[0_14px_30px_rgba(37,29,24,0.10)]"
+                          : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:bg-secondary/70",
                       ].join(" ")}
                     >
                       {option}
@@ -414,52 +442,6 @@ export function ReframeApp() {
       </Card>
 
       <div className="space-y-5">
-        {selectedStory ? (
-          <Card className="border-border bg-background/75">
-            <CardContent className="p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-                      Selected perspective
-                    </p>
-                    <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
-                      {selectedStory.aspirationTheme}
-                    </span>
-                    <span className="rounded-full bg-card px-3 py-1 text-xs text-muted-foreground">
-                      {useSelectedStory ? "Included" : "Not included"}
-                    </span>
-                  </div>
-                  <p className="font-serif text-2xl leading-tight tracking-[-0.02em] text-foreground">
-                    {selectedStory.title}
-                  </p>
-                  <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-                    {selectedStory.shortDescription}
-                  </p>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    This context is optional. It can sit quietly in the background
-                    as a reminder of a wider human frame, or you can turn it off.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant={useSelectedStory ? "secondary" : "default"}
-                    onClick={() => setUseSelectedStory((current) => !current)}
-                  >
-                    {useSelectedStory ? "Ignore context" : "Include context"}
-                  </Button>
-                  <Button type="button" variant="ghost" onClick={handleClearSelectedStory}>
-                    <X className="h-4 w-4" />
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium text-foreground">Output</p>
           <div className="flex flex-wrap items-center gap-3">
@@ -479,7 +461,11 @@ export function ReframeApp() {
               onClick={handleCopy}
               disabled={!result}
             >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
               {copied ? "Copied" : "Copy output"}
             </Button>
           </div>
@@ -500,9 +486,9 @@ export function ReframeApp() {
                           A steadier response is more appropriate here
                         </p>
                         <p className="text-sm leading-7 text-muted-foreground">
-                          The language in this entry suggests a level of distress
-                          that should be met with care first, not a standard
-                          perspective correction.
+                          The language in this entry suggests a level of
+                          distress that should be met with care first, not a
+                          standard perspective correction.
                         </p>
                       </div>
                     </div>
@@ -513,7 +499,10 @@ export function ReframeApp() {
               <div className="grid gap-4 md:grid-cols-2">
                 <OutputCard title="What happened" copy={result.whatHappened} />
                 <OutputCard title="What’s missing" copy={result.whatsMissing} />
-                <OutputCard title="A real perspective" copy={result.realPerspective} />
+                <OutputCard
+                  title="A real perspective"
+                  copy={result.realPerspective}
+                />
                 <OutputCard title="Re-anchor" copy={result.reAnchor} />
               </div>
             </div>
@@ -543,7 +532,8 @@ export function ReframeApp() {
                     No output this time
                   </p>
                   <p className="text-sm leading-7 text-muted-foreground">
-                    Adjust the inputs if needed and try again when you&apos;re ready.
+                    Adjust the inputs if needed and try again when you&apos;re
+                    ready.
                   </p>
                 </div>
               </CardContent>
@@ -560,7 +550,9 @@ export function ReframeApp() {
 
             {historyEntries.length === 0 ? (
               <div className="mt-4 space-y-2">
-                <p className="text-sm font-medium text-foreground">No saved reframes yet</p>
+                <p className="text-sm font-medium text-foreground">
+                  No saved reframes yet
+                </p>
                 <p className="text-sm leading-7 text-muted-foreground">
                   Saved reframes stay on this device. When you save one, it will
                   appear here with a short preview and date.
@@ -614,7 +606,10 @@ export function ReframeApp() {
 }
 
 function createHistoryId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
 
@@ -665,7 +660,6 @@ function isHistoryEntry(value: unknown): value is HistoryEntry {
     Boolean(candidate.values) &&
     typeof candidate.values?.whatDidYouSee === "string" &&
     typeof candidate.values?.brainStory === "string" &&
-    typeof candidate.values?.currentTruth === "string" &&
     Boolean(candidate.result) &&
     typeof candidate.result?.whatHappened === "string" &&
     typeof candidate.result?.whatsMissing === "string" &&
@@ -685,7 +679,7 @@ function formatHistoryDate(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
-    year: "numeric"
+    year: "numeric",
   }).format(date);
 }
 
@@ -694,9 +688,9 @@ function FieldBlock({
   label,
   description,
   error,
-  children
+  children,
 }: {
-  fieldId: string,
+  fieldId: string;
   label: string;
   description: string;
   error?: string;
@@ -708,10 +702,16 @@ function FieldBlock({
   return (
     <div className="space-y-2.5">
       <div className="space-y-1">
-        <label htmlFor={fieldId} className="text-sm font-medium text-foreground">
+        <label
+          htmlFor={fieldId}
+          className="text-sm font-medium text-foreground"
+        >
           {label}
         </label>
-        <p id={descriptionId} className="text-sm leading-6 text-muted-foreground">
+        <p
+          id={descriptionId}
+          className="text-sm leading-6 text-muted-foreground"
+        >
           {description}
         </p>
       </div>
@@ -742,7 +742,11 @@ function OutputCard({ title, copy }: { title: string; copy: string }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-2" role="status" aria-label="Generating perspective">
+    <div
+      className="grid gap-4 md:grid-cols-2"
+      role="status"
+      aria-label="Generating perspective"
+    >
       {Array.from({ length: 4 }).map((_, index) => (
         <Card key={index} className="bg-card/90">
           <CardContent className="space-y-4 p-5 md:p-6">

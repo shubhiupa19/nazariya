@@ -18,7 +18,7 @@ describe("validateTextField", () => {
   it("accepts a valid string", () => {
     const result = validateTextField(
       "This is a valid text field here today.",
-      "testField"
+      "testField",
     );
     expect(result.success).toBe(true);
     if (result.success) {
@@ -27,7 +27,10 @@ describe("validateTextField", () => {
   });
 
   it("trims surrounding whitespace", () => {
-    const result = validateTextField("  spaced out text content  ", "testField");
+    const result = validateTextField(
+      "  spaced out text content  ",
+      "testField",
+    );
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data).toBe("spaced out text content");
@@ -45,7 +48,7 @@ describe("validateTextField", () => {
   it("rejects strings exceeding maximum length", () => {
     const result = validateTextField(
       "x".repeat(VALIDATION_CONFIG.MAX_TEXT_LENGTH + 1),
-      "field"
+      "field",
     );
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -97,7 +100,7 @@ describe("validateTone", () => {
       if (result.success) {
         expect(result.data).toBe(tone);
       }
-    }
+    },
   );
 
   it("rejects an invalid tone string", () => {
@@ -136,7 +139,7 @@ describe("validateReframeRequest", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.toLowerCase()).toContain(
-          expectedError.toLowerCase()
+          expectedError.toLowerCase(),
         );
       }
     });
@@ -185,7 +188,7 @@ describe("validateReframeOutput", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.toLowerCase()).toContain(
-          expectedError.toLowerCase()
+          expectedError.toLowerCase(),
         );
       }
     });
@@ -199,7 +202,8 @@ describe("validateReframeOutput", () => {
         "The context behind their result is missing — you do not know the effort, timeline, or help they had.",
       realPerspective:
         "Their outcome is real, but it is not a reliable measurement of your worth or your pace.",
-      reAnchor: "You are still working. That is a real fact about your life right now.",
+      reAnchor:
+        "You are still working. That is a real fact about your life right now.",
     });
     expect(result.success).toBe(true);
     if (result.success) {

@@ -17,7 +17,10 @@ export interface ErrorInfo {
 /**
  * Categorize an error into a known type.
  */
-export function categorizeError(statusCode: number, _message: string): ErrorInfo["type"] {
+export function categorizeError(
+  statusCode: number,
+  _message: string,
+): ErrorInfo["type"] {
   if (statusCode >= 400 && statusCode < 500) {
     if (statusCode === 401 || statusCode === 403) {
       return "auth";
@@ -51,7 +54,7 @@ export function isRecoverable(statusCode: number): boolean {
  */
 export function createErrorInfo(
   statusCode: number,
-  message: string
+  message: string,
 ): ErrorInfo {
   return {
     status: statusCode,
@@ -133,7 +136,7 @@ export function verifySuccessResponse(response: unknown): boolean {
  */
 export function verifyAPIResponse(
   response: unknown,
-  statusOk: boolean
+  statusOk: boolean,
 ): boolean {
   if (statusOk) {
     return verifySuccessResponse(response);
